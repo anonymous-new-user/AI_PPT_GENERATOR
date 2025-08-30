@@ -323,7 +323,9 @@ class GeminiProvider(AIProvider):
             ]
             
             response = model.generate_content(
-                prompt,
+                [
+                    {"role": "user", "parts": [prompt]}
+                ],
                 generation_config=genai.types.GenerationConfig(
                     temperature=0.3,
                     max_output_tokens=2048,
@@ -417,36 +419,42 @@ class AIPipeProvider(AIProvider):
             logger.error(f"AI Pipe response format error: {e}")
             raise HTTPException(500, "Invalid AI Pipe API response format")
 
-# Add JSON parsing method to base class
 def _parse_json_response(self, content: str) -> Dict[str, Any]:
-    """Parse JSON response with error handling"""
+    """Parse JSON response with extra cleanup for Gemini outputs"""
     if not content or not content.strip():
         return {"slides": [{"title": "Error", "bullets": ["No content generated"]}]}
     
+    cleaned = content.strip()
+
+    # Remove common Gemini wrappers (```json ... ```)
+    if cleaned.startswith("```"):
+        cleaned = re.sub(r"^```[a-zA-Z]*\n?", "", cleaned)
+        cleaned = re.sub(r"```$", "", cleaned).strip()
+
+    # Try direct JSON
     try:
-        # Try direct JSON parsing first
-        data = json.loads(content.strip())
+        data = json.loads(cleaned)
         if isinstance(data, dict) and "slides" in data:
             return data
-    except json.JSONDecodeError:
+    except Exception:
         pass
     
-    # Try to extract JSON from markdown or other formatting
-    json_match = re.search(r'\{.*\}', content.strip(), re.DOTALL)
-    if json_match:
+    # Try extracting the first {...} block
+    match = re.search(r'\{(?:.|\n)*\}', cleaned)
+    if match:
         try:
-            data = json.loads(json_match.group())
+            data = json.loads(match.group())
             if isinstance(data, dict) and "slides" in data:
                 return data
-        except json.JSONDecodeError:
+        except Exception:
             pass
     
-    # Fallback: create a single slide with the content
-    logger.warning(f"Failed to parse JSON response, creating fallback slide")
+    # Fallback: return as a single slide
+    logger.warning("Failed to parse Gemini JSON response, falling back")
     return {
         "slides": [{
-            "title": "Generated Content", 
-            "bullets": [content[:120] + "..." if len(content) > 120 else content]
+            "title": "Generated Content",
+            "bullets": [cleaned[:120] + "..." if len(cleaned) > 120 else cleaned]
         }]
     }
 
@@ -820,3 +828,4 @@ if __name__ == "__main__":
         log_level="info" if not config.DEBUG else "debug"
 
     )
+
