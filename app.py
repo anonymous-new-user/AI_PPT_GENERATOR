@@ -106,6 +106,20 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+import os
+
+# Serve frontend
+@app.get("/", include_in_schema=False)
+async def serve_index():
+    return FileResponse("Index.html")
+
+# Serve favicon (optional, since you already uploaded favicon.ico)
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return FileResponse("favicon.ico")
+
 # Add middleware
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(
@@ -804,4 +818,5 @@ if __name__ == "__main__":
         port=8000,
         reload=config.DEBUG,
         log_level="info" if not config.DEBUG else "debug"
+
     )
