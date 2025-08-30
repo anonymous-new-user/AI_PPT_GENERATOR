@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="AI-Powered Presentation Generator" />
+  <meta name="theme-color" content="#6366f1" />
+  <title>SlideForge AI - Presentation Generator</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/lucide.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --gradient-accent: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --gradient-surface: linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%);
+      --gradient-dark: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+      
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-surface: #ffffff;
+      --border-light: #e2e8f0;
+      --border-medium: #cbd5e1;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --accent: #6366f1;
+      --accent-hover: #5b21b6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      
+      --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.2);
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-surface: #334155;
+      --border-light: #334155;
+      --border-medium: #475569;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --gradient-surface: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+      --glass-bg: rgba(30, 41, 59, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 1rem 0;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--gradient-accent);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn-icon {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .btn-icon:hover {
+      background: var(--bg-secondary);
+      border-color: var(--border-medium);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+    }
+
+    /* Main Layout */
+    .main-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      min-height: calc(100vh - 80px);
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+      .main-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    /* Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .card-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .provider-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .provider-option {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--bg-primary);
+    }
+
+    .provider-option:hover {
+      border-color: var(--border-medium);
+      background: var(--bg-secondary);
+    }
+
+    .provider-option.active {
+      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.05);
+    }
+
+    .provider-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .provider-icon.openai { background: #10a37f; }
+    .provider-icon.anthropic { background: #cc785c; }
+    .provider-icon.gemini { background: #4285f4; }
+    .provider-icon.aipipe { background: var(--gradient-accent); }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    .input-group {
+      position: relative;
+    }
+
+    .input-addon {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.25rem;
+      border-radius: var(--radius-sm);
+      transition: color 0.2s ease;
+    }
+
+    .input-addon:hover {
+      color: var(--text-secondary);
+    }
+
+    /* Main Content */
+    .content-area {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .hero-section {
+      background: var(--gradient-bg);
+      border-radius: var(--radius-xl);
+      padding: 3rem 2rem;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1.125rem;
+      opacity: 0.9;
+      margin-bottom: 2rem;
+    }
+
+    .input-area {
+      background: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .text-input {
+      width: 100%;
+      min-height: 200px;
+      border: 2px dashed var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      font-family: inherit;
+      font-size: 0.875rem;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      resize: vertical;
+      transition: all 0.2s ease;
+    }
+
+    .text-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      border-style: solid;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .text-input:not(:placeholder-shown) {
+      border-style: solid;
+      border-color: var(--border-medium);
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .checkbox-group:hover {
+      background: var(--border-light);
+    }
+
+    .checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-medium);
+      border-radius: var(--radius-sm);
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .checkbox input {
+      opacity: 0;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .checkbox input:checked ~ .checkmark {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .checkbox input:checked ~ .checkmark::after {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 2px;
+      width: 6px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      transition: all 0.2s ease;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--gradient-accent);
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-light);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .generate-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-large {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      border-radius: var(--radius-lg);
+    }
+
+    /* History Section */
+    .history-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+    }
+
+    .history-item:hover {
+      border-color: var(--border-medium);
+      background: var(--bg-secondary);
+    }
+
+    .history-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .history-title {
+      font-weight: 500;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-small {
+      padding: 0.5rem;
+      min-width: 32px;
+      height: 32px;
+    }
+
+    /* Status & Output */
+    .status-section {
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--accent);
+    }
+
+    .status-section.success {
+      border-left-color: var(--success);
+    }
+
+    .status-section.error {
+      border-left-color: var(--danger);
+    }
+
+    .output-preview {
+      background: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      border: 1px solid var(--border-light);
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .toast {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      min-width: 300px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast.success {
+      border-left: 4px solid var(--success);
+    }
+
+    .toast.error {
+      border-left: 4px solid var(--danger);
+    }
+
+    .toast.warning {
+      border-left: 4px solid var(--warning);
+    }
+
+    /* Performance Monitor */
+    .perf-monitor {
+      position: fixed;
+      bottom: 1rem;
+      left: 1rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      z-index: 100;
+    }
+
+    /* Loading States */
+    .loading {
+      position: relative;
+      pointer-events: none;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid var(--border-light);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 1rem;
+      }
+
+      .hero-title {
+        font-size: 2rem;
+      }
+
+      .generate-section {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn-large {
+        width: 100%;
+      }
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-medium);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeInUp 0.3s ease forwards;
+    }
+
+    /* File Upload Styling */
+    .file-upload {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .file-upload-input {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-upload-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem;
+      border: 2px dashed var(--border-light);
+      border-radius: var(--radius-md);
+      background: var(--bg-primary);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .file-upload-label:hover,
+    .file-upload:hover .file-upload-label {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .file-upload.has-file .file-upload-label {
+      border-color: var(--success);
+      color: var(--success);
+      background: rgba(16, 185, 129, 0.05);
+    }
+  </style>
+</head>
+
+<body data-theme="light">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="#" class="logo">
+        <div class="logo-icon">
+          <i data-lucide="presentation"></i>
+        </div>
+        SlideForge AI by PAWAN
+      </a>
+      
+      <div class="header-controls">
+        <button id="theme-toggle" class="btn-icon" title="Toggle Theme">
+          <i data-lucide="moon" id="theme-icon"></i>
+        </button>
+        <button id="settings-btn" class="btn-icon" title="Settings">
+          <i data-lucide="settings"></i>
+        </button>
+        <button id="help-btn" class="btn-icon" title="Help">
+          <i data-lucide="help-circle"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <!-- AI Provider Selection -->
+      <div class="card">
+        <h3 class="card-title">
+          <i data-lucide="cpu"></i>
+          AI Provider
+        </h3>
+        <div class="provider-grid">
+          <div class="provider-option" data-provider="aipipe">
+            <div class="provider-icon aipipe">AI</div>
+            <div>
+              <div style="font-weight: 500;">AI Pipe</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">OpenRouter</div>
+            </div>
+          </div>
+          <div class="provider-option active" data-provider="openai">
+            <div class="provider-icon openai">GPT</div>
+            <div>
+              <div style="font-weight: 500;">OpenAI</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">GPT-4, GPT-3.5</div>
+            </div>
+          </div>
+          <div class="provider-option" data-provider="anthropic">
+            <div class="provider-icon anthropic">Cld</div>
+            <div>
+              <div style="font-weight: 500;">Anthropic</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Claude 3.5</div>
+            </div>
+          </div>
+          <div class="provider-option" data-provider="gemini">
+            <div class="provider-icon gemini">Gem</div>
+            <div>
+              <div style="font-weight: 500;">Google</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Gemini Pro</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configuration -->
+      <div class="card">
+        <h3 class="card-title">
+          <i data-lucide="key"></i>
+          Configuration
+        </h3>
+        
+        <div class="form-group">
+          <label class="form-label" for="api-key">API Key</label>
+          <div class="input-group">
+            <input 
+              type="password" 
+              id="api-key" 
+              class="form-input" 
+              placeholder="Enter your API key..."
+            >
+            <button class="input-addon" id="paste-key" title="Paste from clipboard">
+              <i data-lucide="clipboard"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="model-select">Model</label>
+          <select id="model-select" class="form-select">
+            <option value="gpt-4o-mini">GPT-4O Mini</option>
+            <option value="gpt-4o">GPT-4O</option>
+            <option value="gpt-4">GPT-4</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="slide-count">Number of Slides</label>
+          <input 
+            type="number" 
+            id="slide-count" 
+            class="form-input" 
+            value="10" 
+            min="1" 
+            max="40"
+          >
+        </div>
+      </div>
+
+      <!-- History -->
+      <div class="card">
+        <h3 class="card-title">
+          <i data-lucide="history"></i>
+          Recent Generations
+          <button class="btn-icon btn-small" id="clear-history" title="Clear History">
+            <i data-lucide="trash-2"></i>
+          </button>
+        </h3>
+        
+        <div class="history-grid" id="history-container">
+          <div style="text-align: center; color: var(--text-muted); padding: 2rem 0;">
+            No recent generations
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content-area">
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="hero-content">
+          <h1 class="hero-title">Create Stunning Presentations</h1>
+          <p class="hero-subtitle">
+            Transform your ideas into professional presentations with AI-powered content generation
+          </p>
+        </div>
+      </section>
+
+      <!-- Input Area -->
+      <section class="card input-area">
+        <div class="form-group">
+          <label class="form-label" for="content-input">Your Content</label>
+          <textarea 
+            id="content-input" 
+            class="text-input" 
+            placeholder="Paste your text, markdown, or describe what you want to present...
+
+Example:
+- Company quarterly results
+- Product launch presentation 
+- Training materials on AI
+- Investment pitch for fintech startup
+
+The more context you provide, the better the AI can structure your presentation."
+          ></textarea>
+        </div>
+
+        <div class="options-grid">
+          <div class="form-group">
+            <label class="form-label" for="guidance-input">Presentation Style</label>
+            <input 
+              type="text" 
+              id="guidance-input" 
+              class="form-input" 
+              placeholder="e.g., corporate, creative, academic, pitch"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Template Upload</label>
+            <div class="file-upload">
+              <input type="file" id="template-file" class="file-upload-input" accept=".pptx,.potx">
+              <label for="template-file" class="file-upload-label">
+                <i data-lucide="upload"></i>
+                <span>Choose PPTX template</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="checkbox-group">
+          <div class="checkbox">
+            <input type="checkbox" id="reuse-images">
+            <div class="checkmark"></div>
+          </div>
+          <label for="reuse-images" style="font-size: 0.875rem; color: var(--text-secondary);">
+            Reuse images from template (safe placement)
+          </label>
+        </div>
+
+        <div class="generate-section">
+          <div class="btn-group" style="display: flex; gap: 1rem;">
+            <button id="clear-form" class="btn btn-secondary">
+              <i data-lucide="eraser"></i>
+              Clear Form
+            </button>
+            <button id="download-last" class="btn btn-secondary" disabled>
+              <i data-lucide="download"></i>
+              Download Last
+            </button>
+          </div>
+          
+          <button id="generate-btn" class="btn btn-primary btn-large" disabled>
+            <i data-lucide="wand-2"></i>
+            Generate Presentation
+          </button>
+        </div>
+      </section>
+
+      <!-- Status Section -->
+      <section id="status-section" class="status-section" style="display: none;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div id="status-icon">
+            <i data-lucide="info"></i>
+          </div>
+          <div id="status-text">Ready to generate</div>
+        </div>
+      </section>
+
+      <!-- Output Preview -->
+      <section id="output-section" class="output-preview" style="display: none;">
+        <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="file-text"></i>
+          Generated Presentation
+        </h3>
+        <div id="output-content">
+          <!-- Dynamic content will be inserted here -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Performance Monitor -->
+  <div class="perf-monitor">
+    <div style="font-weight: 600; margin-bottom: 0.25rem;">Performance</div>
+    <div>Response: <span id="perf-time">0ms</span></div>
+    <div>API Calls: <span id="perf-calls">0</span></div>
+  </div>
+
+  <!-- Settings Modal (Hidden) -->
+  <div id="settings-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; backdrop-filter: blur(4px);">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-surface); border-radius: var(--radius-lg); padding: 2rem; max-width: 500px; width: 90vw;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="margin: 0;">Settings</h3>
+        <button id="close-settings" class="btn-icon">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="max-history">Max History Presentations</label>
+        <input type="number" id="max-history" class="form-input" value="50" min="10" max="200">
+      </div>
+      
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+        <button id="export-history" class="btn btn-secondary">
+          <i data-lucide="download"></i>
+          Export History
+        </button>
+        <button id="save-settings" class="btn btn-primary">
+          Save Settings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Application State
+    class SlideForgeApp {
+      constructor() {
+        this.state = {
+          provider: 'openai',
+          apiKey: '',
+          model: 'gpt-4o-mini',
+          slideCount: 10,
+          isGenerating: false,
+          lastGeneratedBlob: null,
+          history: this.loadHistory(),
+          apiCalls: 0,
+          settings: this.loadSettings()
+        };
+        
+        this.models = {
+          openai: [
+            { id: 'gpt-4o-mini', label: 'GPT-4O Mini' },
+            { id: 'gpt-4o', label: 'GPT-4O' },
+            { id: 'gpt-4', label: 'GPT-4' },
+            { id: 'gpt-4-turbo', label: 'GPT-4 Turbo' },
+            { id: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' }
+          ],
+          anthropic: [
+            { id: 'claude-3-5-sonnet-latest', label: 'Claude 3.5 Sonnet' },
+            { id: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet' },
+            { id: 'claude-3-opus', label: 'Claude 3 Opus' },
+            { id: 'claude-3-sonnet', label: 'Claude 3 Sonnet' },
+            { id: 'claude-3-haiku', label: 'Claude 3 Haiku' }
+          ],
+          gemini: [
+            { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
+            { id: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro' },
+            { id: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' },
+            { id: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' }
+          ],
+          aipipe: [
+            { id: 'gpt-4o-mini', label: 'GPT-4O Mini' },
+            { id: 'gpt-4o', label: 'GPT-4O' },
+            { id: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet' },
+            { id: 'gemini-pro', label: 'Gemini Pro' }
+          ]
+        };
+        
+        this.init();
+      }
+
+      init() {
+        this.bindEvents();
+        this.updateModelOptions();
+        this.renderHistory();
+        this.validateForm();
+        this.loadSavedState();
+      }
+
+      bindEvents() {
+        // Provider selection
+        document.querySelectorAll('.provider-option').forEach(option => {
+          option.addEventListener('click', (e) => {
+            document.querySelectorAll('.provider-option').forEach(o => o.classList.remove('active'));
+            option.classList.add('active');
+            this.state.provider = option.dataset.provider;
+            this.updateModelOptions();
+            this.validateForm();
+          });
+        });
+
+        // Form inputs
+        document.getElementById('api-key').addEventListener('input', (e) => {
+          this.state.apiKey = e.target.value;
+          this.validateForm();
+          this.saveState();
+        });
+
+        document.getElementById('model-select').addEventListener('change', (e) => {
+          this.state.model = e.target.value;
+          this.validateForm();
+        });
+
+        document.getElementById('slide-count').addEventListener('input', (e) => {
+          this.state.slideCount = Math.max(1, Math.min(40, parseInt(e.target.value) || 10));
+          this.validateForm();
+        });
+
+        // Paste key button
+        document.getElementById('paste-key').addEventListener('click', async () => {
+          try {
+            const text = await navigator.clipboard.readText();
+            document.getElementById('api-key').value = text.trim();
+            this.state.apiKey = text.trim();
+            this.validateForm();
+            this.showToast('API key pasted successfully', 'success');
+          } catch (error) {
+            this.showToast('Unable to access clipboard', 'error');
+          }
+        });
+
+        // Content input validation
+        document.getElementById('content-input').addEventListener('input', this.validateForm.bind(this));
+
+        // File upload
+        document.getElementById('template-file').addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          const label = document.querySelector('.file-upload-label span');
+          const upload = document.querySelector('.file-upload');
+          
+          if (file) {
+            label.textContent = file.name;
+            upload.classList.add('has-file');
+          } else {
+            label.textContent = 'Choose PPTX template';
+            upload.classList.remove('has-file');
+          }
+        });
+
+        // Generate button
+        document.getElementById('generate-btn').addEventListener('click', this.generatePresentation.bind(this));
+
+        // Clear form
+        document.getElementById('clear-form').addEventListener('click', this.clearForm.bind(this));
+
+        // Download last
+        document.getElementById('download-last').addEventListener('click', this.downloadLast.bind(this));
+
+        // Theme toggle
+        document.getElementById('theme-toggle').addEventListener('click', this.toggleTheme.bind(this));
+
+        // Settings
+        document.getElementById('settings-btn').addEventListener('click', () => {
+          document.getElementById('settings-modal').style.display = 'flex';
+        });
+
+        document.getElementById('close-settings').addEventListener('click', () => {
+          document.getElementById('settings-modal').style.display = 'none';
+        });
+
+        document.getElementById('save-settings').addEventListener('click', this.saveSettings.bind(this));
+
+        document.getElementById('export-history').addEventListener('click', this.exportHistory.bind(this));
+
+        document.getElementById('clear-history').addEventListener('click', this.clearHistory.bind(this));
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+          if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            if (!document.getElementById('generate-btn').disabled) {
+              this.generatePresentation();
+            }
+          }
+        });
+      }
+
+      updateModelOptions() {
+        const select = document.getElementById('model-select');
+        const models = this.models[this.state.provider] || [];
+        
+        select.innerHTML = '';
+        models.forEach(model => {
+          const option = document.createElement('option');
+          option.value = model.id;
+          option.textContent = model.label;
+          select.appendChild(option);
+        });
+        
+        if (models.length > 0) {
+          this.state.model = models[0].id;
+          select.value = this.state.model;
+        }
+      }
+
+      validateForm() {
+        const contentInput = document.getElementById('content-input').value.trim();
+        const apiKey = this.state.apiKey.trim();
+        const slideCount = this.state.slideCount;
+        
+        const isValid = contentInput.length > 10 && 
+                       apiKey.length > 6 && 
+                       slideCount >= 1 && 
+                       slideCount <= 40;
+        
+        document.getElementById('generate-btn').disabled = !isValid || this.state.isGenerating;
+        return isValid;
+      }
+
+      async generatePresentation() {
+        if (!this.validateForm()) {
+          this.showToast('Please complete all required fields', 'error');
+          return;
+        }
+
+        this.state.isGenerating = true;
+        this.state.apiCalls++;
+        
+        const startTime = performance.now();
+        const generateBtn = document.getElementById('generate-btn');
+        const statusSection = document.getElementById('status-section');
+        const statusIcon = document.getElementById('status-icon');
+        const statusText = document.getElementById('status-text');
+        
+        // Update UI
+        generateBtn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Generating...';
+        generateBtn.disabled = true;
+        
+        statusSection.style.display = 'block';
+        statusSection.className = 'status-section';
+        statusIcon.innerHTML = '<i data-lucide="loader"></i>';
+        statusText.textContent = 'Generating presentation...';
+        
+        lucide.createIcons();
+
+        try {
+          // Prepare form data
+          const formData = new FormData();
+          formData.append('text', document.getElementById('content-input').value.trim());
+          formData.append('guidance', document.getElementById('guidance-input').value.trim());
+          formData.append('provider', this.state.provider);
+          formData.append('api_key', this.state.apiKey);
+          formData.append('model', this.state.model);
+          formData.append('num_slides', this.state.slideCount.toString());
+          formData.append('reuse_images', document.getElementById('reuse-images').checked ? 'true' : 'false');
+          
+          const templateFile = document.getElementById('template-file').files[0];
+          if (templateFile) {
+            formData.append('template', templateFile);
+          }
+
+          // Make API call
+          const response = await fetch('/generate', {
+            method: 'POST',
+            body: formData
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            let errorMessage = `Server error (${response.status})`;
+            
+            if (response.status === 401) {
+              errorMessage += ' - Invalid API key';
+            } else if (response.status === 429) {
+              errorMessage += ' - Rate limit exceeded';
+            } else if (errorText.includes('model')) {
+              errorMessage += ' - Model not available';
+            }
+            
+            throw new Error(errorMessage);
+          }
+
+          // Handle successful response
+          const blob = await response.blob();
+          
+          // Store for download
+          if (this.state.lastGeneratedBlob) {
+            URL.revokeObjectURL(this.state.lastGeneratedBlob);
+          }
+          this.state.lastGeneratedBlob = URL.createObjectURL(blob);
+          document.getElementById('download-last').disabled = false;
+
+          // Add to history
+          const historyItem = {
+            id: Date.now(),
+            title: document.getElementById('guidance-input').value || 
+                   document.getElementById('content-input').value.slice(0, 50) + '...',
+            timestamp: new Date().toISOString(),
+            provider: this.state.provider,
+            model: this.state.model,
+            slideCount: this.state.slideCount,
+            size: this.formatFileSize(blob.size)
+          };
+          
+          this.addToHistory(historyItem);
+          this.renderOutput(historyItem);
+
+          // Update status
+          statusSection.className = 'status-section success';
+          statusIcon.innerHTML = '<i data-lucide="check-circle"></i>';
+          statusText.textContent = 'Presentation generated successfully!';
+          
+          this.showToast('Presentation generated successfully!', 'success');
+
+        } catch (error) {
+          console.error('Generation error:', error);
+          
+          statusSection.className = 'status-section error';
+          statusIcon.innerHTML = '<i data-lucide="alert-circle"></i>';
+          statusText.textContent = `Error: ${error.message}`;
+          
+          this.showToast(`Generation failed: ${error.message}`, 'error');
+        } finally {
+          const endTime = performance.now();
+          const duration = Math.round(endTime - startTime);
+          
+          document.getElementById('perf-time').textContent = `${duration}ms`;
+          document.getElementById('perf-calls').textContent = this.state.apiCalls;
+          
+          generateBtn.innerHTML = '<i data-lucide="wand-2"></i> Generate Presentation';
+          this.state.isGenerating = false;
+          this.validateForm();
+          
+          lucide.createIcons();
+        }
+      }
+
+      renderOutput(item) {
+        const outputSection = document.getElementById('output-section');
+        const outputContent = document.getElementById('output-content');
+        
+        outputContent.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius-md);">
+            <div>
+              <div style="font-weight: 600; margin-bottom: 0.25rem;">${item.title}</div>
+              <div style="font-size: 0.875rem; color: var(--text-muted);">
+                ${new Date(item.timestamp).toLocaleString()} • ${item.slideCount} slides • ${item.size}
+              </div>
+            </div>
+            <button id="download-generated" class="btn btn-primary">
+              <i data-lucide="download"></i>
+              Download
+            </button>
+          </div>
+        `;
+        
+        outputSection.style.display = 'block';
+        
+        document.getElementById('download-generated').addEventListener('click', () => {
+          this.downloadLast();
+        });
+        
+        lucide.createIcons();
+      }
+
+      downloadLast() {
+        if (!this.state.lastGeneratedBlob) {
+          this.showToast('No presentation available to download', 'error');
+          return;
+        }
+        
+        const link = document.createElement('a');
+        link.href = this.state.lastGeneratedBlob;
+        link.download = 'presentation.pptx';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        this.showToast('Download started', 'success');
+      }
+
+      clearForm() {
+        document.getElementById('content-input').value = '';
+        document.getElementById('guidance-input').value = '';
+        document.getElementById('slide-count').value = '10';
+        document.getElementById('template-file').value = '';
+        document.getElementById('reuse-images').checked = false;
+        
+        // Reset file upload UI
+        document.querySelector('.file-upload-label span').textContent = 'Choose PPTX template';
+        document.querySelector('.file-upload').classList.remove('has-file');
+        
+        // Hide status and output
+        document.getElementById('status-section').style.display = 'none';
+        document.getElementById('output-section').style.display = 'none';
+        
+        this.state.slideCount = 10;
+        this.validateForm();
+        
+        this.showToast('Form cleared', 'success');
+      }
+
+      addToHistory(item) {
+        this.state.history.unshift(item);
+        this.state.history = this.state.history.slice(0, this.state.settings.maxHistory);
+        this.saveHistory();
+        this.renderHistory();
+      }
+
+      renderHistory() {
+        const container = document.getElementById('history-container');
+        
+        if (this.state.history.length === 0) {
+          container.innerHTML = `
+            <div style="text-align: center; color: var(--text-muted); padding: 2rem 0;">
+              No recent generations
+            </div>
+          `;
+          return;
+        }
+        
+        container.innerHTML = this.state.history.map(item => `
+          <div class="history-item">
+            <div class="history-info">
+              <div class="history-title">${item.title}</div>
+              <div class="history-meta">
+                ${new Date(item.timestamp).toLocaleDateString()} • ${item.model} • ${item.slideCount} slides
+              </div>
+            </div>
+            <div class="history-actions">
+              <button class="btn-icon btn-small" onclick="app.recreateFromHistory(${item.id})" title="Recreate">
+                <i data-lucide="repeat"></i>
+              </button>
+              <button class="btn-icon btn-small" onclick="app.downloadFromHistory(${item.id})" title="Download">
+                <i data-lucide="download"></i>
+              </button>
+            </div>
+          </div>
+        `).join('');
+        
+        lucide.createIcons();
+      }
+
+      recreateFromHistory(id) {
+        const item = this.state.history.find(h => h.id === id);
+        if (!item) return;
+        
+        // Set provider
+        document.querySelectorAll('.provider-option').forEach(o => o.classList.remove('active'));
+        document.querySelector(`[data-provider="${item.provider}"]`).classList.add('active');
+        this.state.provider = item.provider;
+        
+        // Update models and select the right one
+        this.updateModelOptions();
+        document.getElementById('model-select').value = item.model;
+        this.state.model = item.model;
+        
+        // Set slide count
+        document.getElementById('slide-count').value = item.slideCount;
+        this.state.slideCount = item.slideCount;
+        
+        this.validateForm();
+        this.showToast('Settings loaded from history', 'success');
+      }
+
+      downloadFromHistory(id) {
+        this.recreateFromHistory(id);
+        this.showToast('Recreating presentation from history...', 'info');
+        setTimeout(() => this.generatePresentation(), 500);
+      }
+
+      clearHistory() {
+        this.state.history = [];
+        this.saveHistory();
+        this.renderHistory();
+        this.showToast('History cleared', 'success');
+      }
+
+      exportHistory() {
+        const data = JSON.stringify(this.state.history, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'slideforge-history.json';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        URL.revokeObjectURL(url);
+        this.showToast('History exported', 'success');
+      }
+
+      toggleTheme() {
+        const body = document.body;
+        const themeIcon = document.getElementById('theme-icon');
+        
+        if (body.dataset.theme === 'dark') {
+          body.dataset.theme = 'light';
+          themeIcon.setAttribute('data-lucide', 'moon');
+        } else {
+          body.dataset.theme = 'dark';
+          themeIcon.setAttribute('data-lucide', 'sun');
+        }
+        
+        lucide.createIcons();
+        localStorage.setItem('slideforge-theme', body.dataset.theme);
+      }
+
+      saveSettings() {
+        this.state.settings.maxHistory = parseInt(document.getElementById('max-history').value) || 50;
+        localStorage.setItem('slideforge-settings', JSON.stringify(this.state.settings));
+        document.getElementById('settings-modal').style.display = 'none';
+        this.showToast('Settings saved', 'success');
+      }
+
+      showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <i data-lucide="${this.getToastIcon(type)}"></i>
+            <span>${message}</span>
+          </div>
+          <button onclick="this.parentElement.remove()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.25rem;">
+            <i data-lucide="x"></i>
+          </button>
+        `;
+        
+        container.appendChild(toast);
+        
+        // Trigger animation
+        requestAnimationFrame(() => {
+          toast.classList.add('show');
+        });
+        
+        // Auto remove
+        setTimeout(() => {
+          toast.remove();
+        }, 5000);
+        
+        lucide.createIcons();
+      }
+
+      getToastIcon(type) {
+        switch (type) {
+          case 'success': return 'check-circle';
+          case 'error': return 'alert-circle';
+          case 'warning': return 'alert-triangle';
+          default: return 'info';
+        }
+      }
+
+      formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+
+      loadHistory() {
+        try {
+          return JSON.parse(localStorage.getItem('slideforge-history') || '[]');
+        } catch {
+          return [];
+        }
+      }
+
+      saveHistory() {
+        localStorage.setItem('slideforge-history', JSON.stringify(this.state.history));
+      }
+
+      loadSettings() {
+        try {
+          return {
+            maxHistory: 50,
+            ...JSON.parse(localStorage.getItem('slideforge-settings') || '{}')
+          };
+        } catch {
+          return { maxHistory: 50 };
+        }
+      }
+
+      saveState() {
+        localStorage.setItem('slideforge-state', JSON.stringify({
+          apiKey: this.state.apiKey.slice(0, 20) // Only save partial key for security
+        }));
+      }
+
+      loadSavedState() {
+        try {
+          const saved = JSON.parse(localStorage.getItem('slideforge-state') || '{}');
+          if (saved.apiKey) {
+            document.getElementById('api-key').value = saved.apiKey;
+            this.state.apiKey = saved.apiKey;
+          }
+          
+          // Load theme
+          const theme = localStorage.getItem('slideforge-theme') || 'light';
+          document.body.dataset.theme = theme;
+          document.getElementById('theme-icon').setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+          
+          // Load settings
+          document.getElementById('max-history').value = this.state.settings.maxHistory;
+          
+        } catch {
+          // Ignore errors in loading saved state
+        }
+      }
+    }
+
+    // Initialize the application
+    const app = new SlideForgeApp();
+    
+    // Make app globally available for inline event handlers
+    window.app = app;
+  </script>
+</body>
+</html>
